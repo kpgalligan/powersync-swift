@@ -1,5 +1,4 @@
 import SwiftUI
-import PowerSync
 
 @main
 struct PowerSyncExampleApp: App {

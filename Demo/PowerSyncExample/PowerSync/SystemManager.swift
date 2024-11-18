@@ -35,8 +35,8 @@ class SystemManager {
 
     func watchLists(_ callback: @escaping (_ lists: [ListContent]) -> Void ) async {
         for await lists in self.db.watch<[ListContent]>(
-            sql: "SELECT * FROM \(LISTS_TABLE)",
-            parameters: [],
+            "SELECT * FROM \(LISTS_TABLE)",
+            [],
             mapper: { cursor in
                 ListContent(
                     id: cursor.getString(index: 0)!,
@@ -52,20 +52,20 @@ class SystemManager {
 
     func insertList(_ list: NewListContent) async throws {
         _ = try await self.db.execute(
-            sql: "INSERT INTO \(LISTS_TABLE) (id, created_at, name, owner_id) VALUES (uuid(), datetime(), ?, ?)",
-            parameters: [list.name, connector.currentUserID]
+            "INSERT INTO \(LISTS_TABLE) (id, created_at, name, owner_id) VALUES (uuid(), datetime(), ?, ?)",
+            [list.name, connector.currentUserID]
         )
     }
 
     func deleteList(id: String) async throws {
         try await db.writeTransaction(callback: { transaction in
             _ = try await transaction.execute(
-                sql: "DELETE FROM \(LISTS_TABLE) WHERE id = ?",
-                parameters: [id]
+                "DELETE FROM \(LISTS_TABLE) WHERE id = ?",
+                [id]
             )
             _ = try await transaction.execute(
-                sql: "DELETE FROM \(TODOS_TABLE) WHERE list_id = ?",
-                parameters: [id]
+                "DELETE FROM \(TODOS_TABLE) WHERE list_id = ?",
+                [id]
             )
             return
         })
@@ -73,8 +73,8 @@ class SystemManager {
 
     func watchTodos(_ listId: String, _ callback: @escaping (_ todos: [Todo]) -> Void ) async {
         for await todos in self.db.watch(
-            sql: "SELECT * FROM \(TODOS_TABLE) WHERE list_id = ?",
-            parameters: [listId],
+            "SELECT * FROM \(TODOS_TABLE) WHERE list_id = ?",
+            [listId],
             mapper: { cursor in
                 return Todo(
                     id: cursor.getString(index: 0)!,
@@ -95,8 +95,8 @@ class SystemManager {
 
     func insertTodo(_ todo: NewTodo, _ listId: String) async throws {
         _ = try await self.db.execute(
-            sql: "INSERT INTO \(TODOS_TABLE) (id, created_at, created_by, description, list_id, completed) VALUES (uuid(), datetime(), ?, ?, ?, ?)",
-            parameters: [connector.currentUserID, todo.description, listId, todo.isComplete]
+            "INSERT INTO \(TODOS_TABLE) (id, created_at, created_by, description, list_id, completed) VALUES (uuid(), datetime(), ?, ?, ?, ?)",
+            [connector.currentUserID, todo.description, listId, todo.isComplete]
         )
     }
 
@@ -104,13 +104,13 @@ class SystemManager {
         // Do this to avoid needing to handle date time from Swift to Kotlin
         if(todo.isComplete) {
             _ = try await self.db.execute(
-                sql: "UPDATE \(TODOS_TABLE) SET description = ?, completed = ?, completed_at = datetime(), completed_by = ? WHERE id = ?",
-                parameters: [todo.description, todo.isComplete, connector.currentUserID, todo.id]
+                "UPDATE \(TODOS_TABLE) SET description = ?, completed = ?, completed_at = datetime(), completed_by = ? WHERE id = ?",
+                [todo.description, todo.isComplete, connector.currentUserID, todo.id]
             )
         } else {
             _ = try await self.db.execute(
-                sql: "UPDATE \(TODOS_TABLE) SET description = ?, completed = ?, completed_at = NULL, completed_by = NULL WHERE id = ?",
-                parameters: [todo.description, todo.isComplete, todo.id]
+                "UPDATE \(TODOS_TABLE) SET description = ?, completed = ?, completed_at = NULL, completed_by = NULL WHERE id = ?",
+                [todo.description, todo.isComplete, todo.id]
             )
         }
     }
@@ -118,8 +118,8 @@ class SystemManager {
     func deleteTodo(id: String) async throws {
         try await db.writeTransaction(callback: { transaction in
             _ = try await transaction.execute(
-                    sql: "DELETE FROM \(TODOS_TABLE) WHERE id = ?",
-                    parameters: [id]
+                    "DELETE FROM \(TODOS_TABLE) WHERE id = ?",
+                    [id]
                 )
             return
         })

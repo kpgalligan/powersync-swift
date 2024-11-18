@@ -10,10 +10,10 @@ import Foundation
 public protocol PowerSyncDatabaseProtocol: Queries {
     /// The current sync status.
     var currentStatus: SyncStatus { get }
-    
+
     /// Wait for the first sync to occur
     func waitForFirstSync() async throws
-    
+
     /// Connect to the PowerSync service, and keep the databases in sync.
     ///
     /// The connection is automatically re-opened if it fails for any reason.
@@ -45,7 +45,7 @@ public protocol PowerSyncDatabaseProtocol: Queries {
         retryDelayMs: Int64,
         params: [String: JsonParam?]
     ) async throws
-    
+
     /// Get a batch of crud data to upload.
     ///
     /// Returns nil if there is no data to upload.
@@ -61,7 +61,7 @@ public protocol PowerSyncDatabaseProtocol: Queries {
     /// data by transaction. One batch may contain data from multiple transactions,
     /// and a single transaction may be split over multiple batches.
     func getCrudBatch(limit: Int32) async throws -> CrudBatch?
-    
+
     /// Get the next recorded transaction to upload.
     ///
     /// Returns nil if there is no data to upload.
@@ -74,15 +74,15 @@ public protocol PowerSyncDatabaseProtocol: Queries {
     /// Unlike `getCrudBatch`, this only returns data from a single transaction at a time.
     /// All data for the transaction is loaded into memory.
     func getNextCrudTransaction() async throws -> CrudTransaction?
-    
+
     /// Convenience method to get the current version of PowerSync.
     func getPowerSyncVersion() async throws -> String
-    
+
     /// Close the sync connection.
     ///
     /// Use `connect` to connect again.
     func disconnect() async throws
-    
+
     /// Disconnect and clear the database.
     /// Use this when logging out.
     /// The database can still be queried after this is called, but the tables
@@ -106,11 +106,11 @@ public extension PowerSyncDatabaseProtocol {
             params: params
         )
     }
-    
+
     func disconnectAndClear(clearLocal: Bool = true) async throws {
         try await disconnectAndClear(clearLocal: clearLocal)
     }
-    
+
     func getCrudBatch(limit: Int32 = 100) async throws -> CrudBatch? {
         try await getCrudBatch(limit: 100)
     }

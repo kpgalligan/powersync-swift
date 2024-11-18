@@ -1,5 +1,4 @@
 import Foundation
-import PowerSync
 
 struct ListContent: Identifiable, Hashable, Decodable {
     let id: String

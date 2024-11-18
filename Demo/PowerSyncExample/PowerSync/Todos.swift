@@ -1,5 +1,4 @@
 import Foundation
-import PowerSync
 
 struct Todo: Identifiable, Hashable, Decodable {
     let id: String
