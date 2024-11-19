@@ -105,13 +105,13 @@ final class BucketStateManagerTests: XCTestCase {
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
         """
         
-        _ = try await database.execute(insertSql, ["bucket1", 100, 100, 0, 0, 12345, 0])
+        _ = try await database.execute(insertSql, ["bucket8", 100, 100, 0, 0, 12345, 0])
         
         let checkpoint = Checkpoint(
             lastOpId: "200",
             checksums: [
                 BucketChecksum(
-                    bucket: "bucket1",
+                    bucket: "bucket8",
                     checksum: 54321,
                     count: 10,
                     lastOpId: "200"
@@ -123,7 +123,7 @@ final class BucketStateManagerTests: XCTestCase {
         try await SUT.updateBucketsWithCheckpoint(checkpoint)
         
         let buckets = try await database.getAll(
-            "SELECT name, last_op FROM ps_buckets WHERE name = 'bucket1'",
+            "SELECT name, last_op FROM ps_buckets WHERE name = 'bucket8'",
             mapper: { cursor in
                 (name: cursor.getString(index: 0)!, lastOp: cursor.getString(index: 1)!)
             }

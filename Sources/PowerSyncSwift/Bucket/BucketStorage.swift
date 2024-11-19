@@ -89,7 +89,7 @@ actor BucketStorage {
 
         logger.info("Updating target to checkpoint \(opId)")
 
-        return try await db.writeTransaction { [weak self] transaction in
+        return try await db.writeTransaction { [weak self] in
             guard let self = self else { return false }
 
             if try await hasCrud() {
@@ -109,7 +109,7 @@ actor BucketStorage {
                 return false
             }
 
-            _ = try await transaction.execute(
+            _ = try await db.execute(
                 "UPDATE \(InternalTable.buckets) SET target_op = CAST(? as INTEGER) WHERE name='$local'",
                 [opId]
             )
@@ -183,13 +183,13 @@ actor BucketStorage {
     }
 
     private func updateObjectsFromBuckets() async throws -> Bool {
-        try await db.writeTransaction { transaction in
-            _ = try await db.execute(
+        try await db.writeTransaction {
+            _ = try await self.db.execute(
                 "INSERT INTO powersync_operations(op, data) VALUES(?, ?)",
                 ["sync_local", ""]
             )
 
-            let res = try await db.get("select last_insert_rowid()", mapper: { $0.getLong(index: 0)! })
+            let res = try await self.db.get("select last_insert_rowid()", mapper: { $0.getLong(index: 0)! })
 
             return res == 1
         }

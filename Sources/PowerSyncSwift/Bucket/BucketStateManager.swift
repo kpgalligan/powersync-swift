@@ -44,14 +44,14 @@ class BucketStateManager {
     func updateBucketsWithCheckpoint(_ targetCheckpoint: Checkpoint) async throws {
         let bucketNames = targetCheckpoint.checksums.map { $0.bucket }
         
-        try await db.writeTransaction { transaction in
-            _ = try await transaction.execute(
+        try await db.writeTransaction {
+            _ = try await self.db.execute(
                 "UPDATE ps_buckets SET last_op = ? WHERE name IN (SELECT json_each.value FROM json_each(?))",
                 [targetCheckpoint.lastOpId, String(data: try JSONEncoder().encode(bucketNames), encoding: .utf8)!]
             )
             
             if let writeCheckpoint = targetCheckpoint.writeCheckpoint {
-                _ = try await transaction.execute(
+                _ = try await self.db.execute(
                     "UPDATE ps_buckets SET last_op = ? WHERE name = '$local'",
                     [writeCheckpoint]
                 )

@@ -14,7 +14,7 @@
 		6A7315882B9854220004CB17 /* PowerSyncExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A7315872B9854220004CB17 /* PowerSyncExampleApp.swift */; };
 		6A73158C2B9854240004CB17 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A73158B2B9854240004CB17 /* Assets.xcassets */; };
 		6A73158F2B9854240004CB17 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6A73158E2B9854240004CB17 /* Preview Assets.xcassets */; };
-		6A7315BB2B98BDD30004CB17 /* PowerSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A7315BA2B98BDD30004CB17 /* PowerSyncManager.swift */; };
+		6A7315BB2B98BDD30004CB17 /* SystemManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A7315BA2B98BDD30004CB17 /* SystemManager.swift */; };
 		6A9668FE2B9EE4FE00B05DCF /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 6A9668FD2B9EE4FE00B05DCF /* Auth */; };
 		6A9669002B9EE4FE00B05DCF /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 6A9668FF2B9EE4FE00B05DCF /* PostgREST */; };
 		6A9669022B9EE69500B05DCF /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6A9669012B9EE69500B05DCF /* Supabase */; };
@@ -38,6 +38,7 @@
 		B66658772C63B7BB00159A81 /* IdentifiedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = B66658762C63B7BB00159A81 /* IdentifiedCollections */; };
 		B666587A2C63B88700159A81 /* SwiftUINavigation in Frameworks */ = {isa = PBXBuildFile; productRef = B66658792C63B88700159A81 /* SwiftUINavigation */; };
 		B666587C2C63B88700159A81 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = B666587B2C63B88700159A81 /* SwiftUINavigationCore */; };
+		B66A46802CD8E0B200597FB3 /* SwiftDotenv in Frameworks */ = {isa = PBXBuildFile; productRef = B66A467F2CD8E0B200597FB3 /* SwiftDotenv */; };
 		B69F7D862C8EE27400565448 /* AnyCodable in Frameworks */ = {isa = PBXBuildFile; productRef = B69F7D852C8EE27400565448 /* AnyCodable */; };
 		B6B3698A2C64F4B30033C307 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B369892C64F4B30033C307 /* Navigation.swift */; };
 /* End PBXBuildFile section */
@@ -64,7 +65,7 @@
 		6A7315872B9854220004CB17 /* PowerSyncExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSyncExampleApp.swift; sourceTree = "<group>"; };
 		6A73158B2B9854240004CB17 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6A73158E2B9854240004CB17 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		6A7315BA2B98BDD30004CB17 /* PowerSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerSyncManager.swift; sourceTree = "<group>"; };
+		6A7315BA2B98BDD30004CB17 /* SystemManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemManager.swift; sourceTree = "<group>"; };
 		6A9669032B9EE6FA00B05DCF /* SignInScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInScreen.swift; sourceTree = "<group>"; };
 		6ABD78662B9F2B4800558A41 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		6ABD786A2B9F2C1500558A41 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
@@ -83,6 +84,7 @@
 		B66658642C62314B00159A81 /* Lists.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lists.swift; sourceTree = "<group>"; };
 		B66658662C62315400159A81 /* Todos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Todos.swift; sourceTree = "<group>"; };
 		B6B369892C64F4B30033C307 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigation.swift; sourceTree = "<group>"; };
+		B6CEC5EA2CCFA88B0054FCD3 /* powersync-kotlin */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "powersync-kotlin"; path = "/Users/dominic/Desktop/powersync/powersync-kotlin"; sourceTree = "<absolute>"; };
 		B6F4210E2BC42F450005D0D0 /* cstubs.bc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cstubs.bc; sourceTree = "<group>"; };
 		B6F421102BC42F450005D0D0 /* manifest.properties */ = {isa = PBXFileReference; lastKnownFileType = text; path = manifest.properties; sourceTree = "<group>"; };
 		B6F421122BC42F450005D0D0 /* cstubs.bc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cstubs.bc; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				6A9669002B9EE4FE00B05DCF /* PostgREST in Frameworks */,
 				18F30B2A2CCA4CD900A58917 /* PowerSyncSwift in Frameworks */,
 				6A9668FE2B9EE4FE00B05DCF /* Auth in Frameworks */,
+				B66A46802CD8E0B200597FB3 /* SwiftDotenv in Frameworks */,
 				B666587A2C63B88700159A81 /* SwiftUINavigation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -130,6 +133,7 @@
 		6A73157B2B9854220004CB17 = {
 			isa = PBXGroup;
 			children = (
+				B6CEC5EA2CCFA88B0054FCD3 /* powersync-kotlin */,
 				6A7315862B9854220004CB17 /* PowerSyncExample */,
 				6A7315852B9854220004CB17 /* Products */,
 				6A7315B52B9857AD0004CB17 /* Frameworks */,
@@ -218,7 +222,7 @@
 		B65C4D6F2C60D58500176007 /* PowerSync */ = {
 			isa = PBXGroup;
 			children = (
-				6A7315BA2B98BDD30004CB17 /* PowerSyncManager.swift */,
+				6A7315BA2B98BDD30004CB17 /* SystemManager.swift */,
 				6A4AD3842B9EE763005CBFD4 /* SupabaseConnector.swift */,
 				6ABD78772B9F2D2800558A41 /* Schema.swift */,
 				B66658642C62314B00159A81 /* Lists.swift */,
@@ -482,6 +486,7 @@
 				B666587B2C63B88700159A81 /* SwiftUINavigationCore */,
 				B69F7D852C8EE27400565448 /* AnyCodable */,
 				18F30B292CCA4CD900A58917 /* PowerSyncSwift */,
+				B66A467F2CD8E0B200597FB3 /* SwiftDotenv */,
 			);
 			productName = PowerSyncExample;
 			productReference = 6A7315842B9854220004CB17 /* PowerSyncExample.app */;
@@ -518,6 +523,7 @@
 				B66658782C63B88700159A81 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				B69F7D842C8EE27300565448 /* XCRemoteSwiftPackageReference "AnyCodable" */,
 				18F30B282CCA4B3B00A58917 /* XCLocalSwiftPackageReference "../../powersync-swift" */,
+				B66A467E2CD8E0B200597FB3 /* XCRemoteSwiftPackageReference "swift-dotenv" */,
 			);
 			productRefGroup = 6A7315852B9854220004CB17 /* Products */;
 			projectDirPath = "";
@@ -567,7 +573,7 @@
 				B66658632C621CA700159A81 /* AddTodoListView.swift in Sources */,
 				B666585D2C620E9E00159A81 /* WifiIcon.swift in Sources */,
 				6A9669042B9EE6FA00B05DCF /* SignInScreen.swift in Sources */,
-				6A7315BB2B98BDD30004CB17 /* PowerSyncManager.swift in Sources */,
+				6A7315BB2B98BDD30004CB17 /* SystemManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -821,6 +827,14 @@
 				minimumVersion = 1.5.4;
 			};
 		};
+		B66A467E2CD8E0B200597FB3 /* XCRemoteSwiftPackageReference "swift-dotenv" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/thebarndog/swift-dotenv.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 		B69F7D842C8EE27300565448 /* XCRemoteSwiftPackageReference "AnyCodable" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Flight-School/AnyCodable";
@@ -866,6 +880,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B66658782C63B88700159A81 /* XCRemoteSwiftPackageReference "swiftui-navigation" */;
 			productName = SwiftUINavigationCore;
+		};
+		B66A467F2CD8E0B200597FB3 /* SwiftDotenv */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B66A467E2CD8E0B200597FB3 /* XCRemoteSwiftPackageReference "swift-dotenv" */;
+			productName = SwiftDotenv;
 		};
 		B69F7D852C8EE27400565448 /* AnyCodable */ = {
 			isa = XCSwiftPackageProductDependency;

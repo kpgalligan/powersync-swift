@@ -1,4 +1,5 @@
 import Foundation
+import PowerSync
 
 /// A PowerSync managed database.
 ///
@@ -9,7 +10,7 @@ import Foundation
 /// All changes to local tables are automatically recorded, whether connected or not. Once connected, the changes are uploaded.
 public protocol PowerSyncDatabaseProtocol: Queries {
     /// The current sync status.
-    var currentStatus: SyncStatus { get }
+    var currentStatus: PowerSync.SyncStatus { get }
 
     /// Wait for the first sync to occur
     func waitForFirstSync() async throws

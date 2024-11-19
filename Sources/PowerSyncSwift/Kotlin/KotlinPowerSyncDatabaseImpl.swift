@@ -1,111 +1,131 @@
 import Foundation
 import PowerSync
 
-final class KotlinPowerSyncDatabaseImpl: PowerSyncDatabaseProtocol {
-    private let kmpDatabase: PowerSync.PowerSyncDatabase
-    
-    var currentStatus: SyncStatus {
-        get { kmpDatabase.currentStatus }
+class KotlinPowerSyncDatabaseImpl: PowerSyncDatabaseProtocol {
+    private var kotlinDatabase: PowerSync.PowerSyncDatabase
+
+    var currentStatus: PowerSync.SyncStatus {
+        get { kotlinDatabase.currentStatus }
     }
-    
+
     init(
         schema: Schema,
         dbFilename: String
     ) {
         let factory = PowerSync.DatabaseDriverFactory()
-        self.kmpDatabase = PowerSyncDatabase(
+        let driver = factory.createDriver(
+            scope: PowerSync.ScopeFactory().createGlobalScope(),
+            dbFilename: dbFilename
+        )
+        self.kotlinDatabase = PowerSyncDatabase(
             factory: factory,
             schema: KotlinAdapter.Schema.toKotlin(schema),
             dbFilename: dbFilename
         )
     }
 
-    func waitForFirstSync() async throws {
-        try await kmpDatabase.waitForFirstSync()
+    init(kotlinDatabase: PowerSync.PowerSyncDatabase) {
+        self.kotlinDatabase = kotlinDatabase
     }
-    
-    func connect(
-        connector: PowerSyncBackendConnector,
+
+    public func asKotlinDatabase() -> PowerSync.PowerSyncDatabase {
+        return kotlinDatabase
+    }
+
+    public func waitForFirstSync() async throws {
+//        try await kotlinDatabase.waitForFirstSync()
+    }
+
+    public func connect(
+        connector: PowerSync.PowerSyncBackendConnector,
         crudThrottleMs: Int64 = 1000,
         retryDelayMs: Int64 = 5000,
         params: [String: JsonParam?] = [:]
     ) async throws {
-        try await kmpDatabase.connect(
+
+
+        try await kotlinDatabase.connect(
             connector: connector,
             crudThrottleMs: crudThrottleMs,
             retryDelayMs: retryDelayMs,
             params: params
         )
     }
-    
-    func getCrudBatch(limit: Int32 = 100) async throws -> CrudBatch? {
-        try await kmpDatabase.getCrudBatch(limit: limit)
+
+    public func getCrudBatch(limit: Int32 = 100) async throws -> CrudBatch? {
+        if let kotlinBatch = try await kotlinDatabase.getCrudBatch(limit: limit) {
+            return CrudBatch.fromKotlin(kotlinBatch)
+        }
+        return nil
     }
-    
-    func getNextCrudTransaction() async throws -> CrudTransaction? {
-        try await kmpDatabase.getNextCrudTransaction()
+
+    public func getNextCrudTransaction() async throws -> CrudTransaction? {
+        if let kotlinTransaction = try await kotlinDatabase.getNextCrudTransaction() {
+            return CrudTransaction.fromKotlin(kotlinTransaction)
+        }
+        return nil
     }
-    
-    func getPowerSyncVersion() async throws -> String {
-        try await kmpDatabase.getPowerSyncVersion()
+
+    public func getPowerSyncVersion() async throws -> String {
+        try await kotlinDatabase.getPowerSyncVersion()
     }
-    
-    func disconnect() async throws {
-        try await kmpDatabase.disconnect()
+
+    public func disconnect() async throws {
+        try await kotlinDatabase.disconnect()
     }
-    
-    func disconnectAndClear(clearLocal: Bool = true) async throws {
-        try await kmpDatabase.disconnectAndClear(clearLocal: clearLocal)
+
+    public func disconnectAndClear(clearLocal: Bool = true) async throws {
+        try await kotlinDatabase.disconnectAndClear(clearLocal: clearLocal)
     }
-    
-    func execute(sql: String, parameters: [Any]?) async throws -> Int64 {
-        Int64(truncating: try await kmpDatabase.execute(sql: sql, parameters: parameters))
+
+    public func execute(_ sql: String, _ parameters: [Any]?) async throws -> Int64 {
+        Int64(truncating: try await kotlinDatabase.execute(sql: sql, parameters: parameters))
     }
-    
-    func get<RowType>(
-        sql: String,
-        parameters: [Any]?,
+
+    public func get<RowType>(
+        _ sql: String,
+        _ parameters: [Any]?,
         mapper: @escaping (SqlCursor) -> RowType
     ) async throws -> RowType {
-        try await kmpDatabase.get(
+        try await kotlinDatabase.get(
             sql: sql,
             parameters: parameters,
             mapper: mapper
         ) as! RowType
     }
-    
-    func getAll<RowType>(
-        sql: String,
-        parameters: [Any]?,
+
+    public func getAll<RowType>(
+        _ sql: String,
+        _ parameters: [Any]?,
         mapper: @escaping (SqlCursor) -> RowType
     ) async throws -> [RowType] {
-        try await kmpDatabase.getAll(
+        try await kotlinDatabase.getAll(
             sql: sql,
             parameters: parameters,
             mapper: mapper
         ) as! [RowType]
     }
-    
-    func getOptional<RowType>(
-        sql: String,
-        parameters: [Any]?,
+
+    public func getOptional<RowType>(
+        _ sql: String,
+        _ parameters: [Any]?,
         mapper: @escaping (SqlCursor) -> RowType
     ) async throws -> RowType? {
-        try await kmpDatabase.getOptional(
+        try await kotlinDatabase.getOptional(
             sql: sql,
             parameters: parameters,
             mapper: mapper
         ) as! RowType?
     }
-    
-    func watch<RowType>(
-        sql: String,
-        parameters: [Any]?,
+
+    public func watch<RowType>(
+        _ sql: String,
+        _ parameters: [Any]?,
         mapper: @escaping (SqlCursor) -> RowType
     ) -> AsyncStream<[RowType]> {
         AsyncStream { continuation in
             Task {
-                for await values in self.kmpDatabase.watch(
+                for await values in self.kotlinDatabase.watch(
                     sql: sql,
                     parameters: parameters,
                     mapper: mapper
@@ -116,54 +136,126 @@ final class KotlinPowerSyncDatabaseImpl: PowerSyncDatabaseProtocol {
             }
         }
     }
-    
-    func writeTransaction<R>(callback: @escaping (any PowerSyncTransactionProtocol) async throws -> R) async throws -> R {
-        let wrappedCallback = SuspendTaskWrapper { [kmpDatabase] in
-            // Create a wrapper that converts the KMP transaction to our Swift protocol
-            if let kmpTransaction = kmpDatabase as? PowerSyncTransactionProtocol {
-                return try await callback(kmpTransaction)
-            } else {
-                throw PowerSyncError.invalidTransaction
-            }
-        }
-        
-        return try await kmpDatabase.writeTransaction(callback: wrappedCallback) as! R
+
+    @MainActor
+    public func writeTransaction<R>(callback: @escaping () async throws -> R) async throws -> R {
+        return try await kotlinDatabase.readTransaction(callback: SuspendTaskWrapper {
+            return try await callback()
+        }) as! R
     }
-    
-    func readTransaction<R>(callback: @escaping (any PowerSyncTransactionProtocol) async throws -> R) async throws -> R {
-        let wrappedCallback = SuspendTaskWrapper { [kmpDatabase] in
-            // Create a wrapper that converts the KMP transaction to our Swift protocol
-            if let kmpTransaction = kmpDatabase as? PowerSyncTransactionProtocol {
-                return try await callback(kmpTransaction)
-            } else {
-                throw PowerSyncError.invalidTransaction
-            }
-        }
-        
-        return try await kmpDatabase.readTransaction(callback: wrappedCallback) as! R
+
+    public func readTransaction<R>(callback: @escaping () async throws -> R) async throws -> R {
+        return try await kotlinDatabase.readTransaction(callback: SuspendTaskWrapper {
+            return try await callback()
+        }) as! R
     }
 }
 
 enum PowerSyncError: Error {
     case invalidTransaction
+    case invalidCredentials
+    case issueFetchingCredentials
 }
 
+@MainActor
 class SuspendTaskWrapper: KotlinSuspendFunction1 {
     let handle: () async throws -> Any
 
     init(_ handle: @escaping () async throws -> Any) {
         self.handle = handle
+        print("🧵 SuspendTaskWrapper initialized on thread: \(Thread.current)")
     }
 
-    @MainActor
-    func invoke(p1: Any?, completionHandler: @escaping (Any?, Error?) -> Void) {
-        Task {
-            do {
-                let result = try await self.handle()
-                completionHandler(result, nil)
-            } catch {
-                completionHandler(nil, error)
+    
+    nonisolated func __invoke(p1: Any?, completionHandler: @escaping (Any?, Error?) -> Void) {
+        DispatchQueue.main.async {
+            print("🧵 __invoke called on thread: \(Thread.current)")
+            
+            // Use specific dispatcher/actor if needed
+            Task { @MainActor in
+                print("🧵 Task started on thread: \(Thread.current)")
+                do {
+                    let result = try await self.handle()
+                    print("🧵 Handle completed on thread: \(Thread.current)")
+                    completionHandler(result, nil)
+                } catch {
+                    print("❌ Error on thread: \(Thread.current)")
+                    debugPrint("Error: \(error)")
+                    completionHandler(nil, error)
+                }
+                print("🧵 Task completed on thread: \(Thread.current)")
             }
         }
+    }
+}
+
+//class SuspendTaskWrapper: KotlinSuspendFunction1 {
+//    let handle: () async throws -> Any
+//
+//    init(_ handle: @escaping () async throws -> Any) {
+//        self.handle = handle
+//    }
+//
+//    func __invoke(p1: Any?, completionHandler: @escaping (Any?, Error?) -> Void) {
+//        Task {
+//            do {
+//                let result = try await self.handle()
+//                completionHandler(result, nil)
+//            } catch {
+//                debugPrint("Error: \(error)")
+//                completionHandler(nil, error)
+//            }
+//        }
+//    }
+//}
+
+extension CrudEntry {
+    static func fromKotlin(_ kotlinEntry: PowerSync.CrudEntry) -> CrudEntry {
+        return CrudEntry(
+            id: kotlinEntry.id,
+            clientId: Int(kotlinEntry.clientId),
+            op: UpdateType.fromKotlin(kotlinEntry.op),
+            table: kotlinEntry.table,
+            transactionId: kotlinEntry.transactionId.map { Int(truncating: $0) },
+            opData: kotlinEntry.opData.map { dict in
+                dict.mapValues { value in
+                    value as? String
+                }
+            }
+        )
+    }
+}
+
+extension UpdateType {
+    static func fromKotlin(_ kotlinType: PowerSync.UpdateType) -> UpdateType {
+        switch kotlinType {
+        case .put: return .put
+        case .patch: return .patch
+        case .delete: return .delete
+        }
+    }
+}
+
+extension CrudTransaction {
+    static func fromKotlin(_ kotlinTransaction: PowerSync.CrudTransaction) -> CrudTransaction {
+        return CrudTransaction(
+            transactionId: kotlinTransaction.transactionId.map { Int(truncating: $0) },
+            crud: kotlinTransaction.crud.map { CrudEntry.fromKotlin($0) },
+            complete: { checkpoint in
+                    _ = try await kotlinTransaction.complete.invoke(p1: checkpoint)
+            }
+        )
+    }
+}
+
+extension CrudBatch {
+    static func fromKotlin(_ kotlinBatch: PowerSync.CrudBatch) -> CrudBatch {
+        return CrudBatch(
+            crud: kotlinBatch.crud.map { CrudEntry.fromKotlin($0) },
+            hasMore: kotlinBatch.hasMore,
+            complete: { checkpoint in
+                    _ = try await kotlinBatch.complete.invoke(p1: checkpoint)
+            }
+        )
     }
 }

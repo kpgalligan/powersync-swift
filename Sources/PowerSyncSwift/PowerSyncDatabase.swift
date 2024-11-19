@@ -8,10 +8,11 @@ public let DEFAULT_DB_FILENAME = "powersync.db"
 ///   - schema: The database schema
 ///   - dbFilename: The database filename. Defaults to "powersync.db"
 /// - Returns: A configured PowerSyncDatabase instance
+
 public func PowerSyncDatabase(
     schema: Schema,
     dbFilename: String = DEFAULT_DB_FILENAME
-) -> PowerSyncDatabaseProtocol {
+) async -> PowerSyncDatabaseProtocol {
     
     return KotlinPowerSyncDatabaseImpl(
         schema: schema,

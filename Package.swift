@@ -7,7 +7,7 @@ let packageName = "PowerSyncSwift"
 let package = Package(
     name: packageName,
     platforms: [
-        .iOS(.v13),
+        .iOS(.v14),
         .macOS(.v10_13)
     ],
     products: [
@@ -15,10 +15,14 @@ let package = Package(
         .library(
             name: packageName,
             targets: ["PowerSyncSwift"]),
+        
     ],
     dependencies: [
-        .package(url: "https://github.com/powersync-ja/powersync-kotlin.git", exact: "1.0.0-BETA5.0"),
+//        .package(url: "https://github.com/powersync-ja/powersync-kotlin.git", exact: "1.0.0-BETA5.0"),
+        .package(path: "../powersync-kotlin"),
         .package(url: "https://github.com/powersync-ja/powersync-sqlite-core-swift.git", "0.3.1"..<"0.4.0"),
+        .package(url: "https://github.com/Alamofire/Alamofire.git", .upToNextMajor(from: "5.10.0")),
+        .package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -27,7 +31,9 @@ let package = Package(
             name: packageName,
             dependencies: [
                 .product(name: "PowerSync", package: "powersync-kotlin"),
-                .product(name: "PowerSyncSQLiteCore", package: "powersync-sqlite-core-swift")
+                .product(name: "PowerSyncSQLiteCore", package: "powersync-sqlite-core-swift"),
+                .product(name: "Alamofire", package: "Alamofire"),
+                .product(name: "AnyCodable", package: "AnyCodable"),
             ]),
         .testTarget(
             name: "PowerSyncSwiftTests",
